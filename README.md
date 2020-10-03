@@ -5,7 +5,7 @@
 [Image1 : 3 Level Expendable ListView]
 
 <div>
-<img src="https://github.com/DonggeunJung/ThreeLevelExpandableListView/blob/master/ScreenShot01.png?raw=true width="300px" height="500px"></img>
+<img src="https://github.com/DonggeunJung/ThreeLevelExpandableListView/blob/main/ScreenShot01.png?raw=true width="300px" height="500px"></img>
 </div>
 
 

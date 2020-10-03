@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/background"
     android:layout_width="match_parent"
     android:layout_height="100dp"
     android:background="#ff8800"
@@ -10,7 +11,7 @@
         android:id="@+id/eventsListEventRowText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="20dp"
+        android:paddingLeft="25dp"
         android:textColor="@android:color/white"
         android:textSize="18sp"/>
 </LinearLayout>

@@ -8,18 +8,25 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
+
 import java.util.List;
 
 public class Level1Adapter extends BaseExpandableListAdapter {
 
     private Context context;
     private List<RowData> arrData;
+    private ExpandableListView mainListView;
 
     public Level1Adapter(Context context, List<RowData> arrData,
-                         OnClickListener onClickListener) {
+                         OnClickListener onClickListener, ExpandableListView mainListView) {
         this.context = context;
         this.arrData = arrData;
         this.onClickListener = onClickListener;
+        this.mainListView = mainListView;
+        mainListView.setAdapter(this);
+        mainListView.setOnGroupClickListener(onLevel1ClickListener);
+        mainListView.setGroupIndicator(context.getResources().getDrawable(R.drawable.expandable_indicator));
     }
 
     @Override
@@ -39,7 +46,9 @@ public class Level1Adapter extends BaseExpandableListAdapter {
         Level2Adapter level2Adapter = new Level2Adapter(context, groupPosition+1, childPosition+1);
         secondLevelELV.setAdapter(level2Adapter);
         secondLevelELV.setGroupIndicator(null);
-        secondLevelELV.setOnChildClickListener(level2Adapter.onChildClickListener);
+        secondLevelELV.setOnGroupClickListener(level2Adapter.onLevel2ClickListener);
+        secondLevelELV.setOnChildClickListener(level2Adapter.onLevel3ClickListener);
+        //secondLevelELV.setGroupIndicator(context.getResources().getDrawable(R.drawable.expandable_indicator));
         return secondLevelELV;
     }
 
@@ -68,6 +77,9 @@ public class Level1Adapter extends BaseExpandableListAdapter {
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.row_first, null);
+            if(getRowCount(groupPosition + 1) == 0) {
+                convertView.findViewById(R.id.background).setBackgroundColor(ContextCompat.getColor(context, R.color.colorGroupBackNoChild));
+            }
             TextView text = convertView.findViewById(R.id.eventsListEventRowText);
             RowData rowData = getRowData(groupPosition + 1);
             if(rowData != null) {
@@ -86,7 +98,6 @@ public class Level1Adapter extends BaseExpandableListAdapter {
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return true;
     }
-
 
     private int getRowCount() {
         int count = 0;
@@ -145,6 +156,16 @@ public class Level1Adapter extends BaseExpandableListAdapter {
         return null;
     }
 
+    public ExpandableListView.OnGroupClickListener onLevel1ClickListener =
+            new ExpandableListView.OnGroupClickListener() {
+        public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition,
+                                     long id) {
+            if(onClickListener != null) {
+                onClickListener.onExpandableClick(groupPosition+1);
+            }
+            return false;
+        }
+    };
 
     public class SecondLevelExpandableListView extends ExpandableListView {
 
@@ -235,13 +256,24 @@ public class Level1Adapter extends BaseExpandableListAdapter {
             return true;
         }
 
-        public ExpandableListView.OnChildClickListener onChildClickListener = new ExpandableListView.OnChildClickListener() {
+        public ExpandableListView.OnGroupClickListener onLevel2ClickListener =
+                new ExpandableListView.OnGroupClickListener() {
+                    public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition,
+                                                long id) {
+                        if(onClickListener != null) {
+                            onClickListener.onExpandableClick(level1, level2);
+                        }
+                        return false;
+                    }
+                };
+
+        public ExpandableListView.OnChildClickListener onLevel3ClickListener = new ExpandableListView.OnChildClickListener() {
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition,
                                         int childPosition, long id) {
                 if(onClickListener != null) {
-                    onClickListener.onClick(level1, level2, childPosition+1);
+                    onClickListener.onExpandableClick(level1, level2, childPosition+1);
                 }
-                return true;
+                return false;
             }
         };
     }
@@ -262,11 +294,9 @@ public class Level1Adapter extends BaseExpandableListAdapter {
 
     private OnClickListener onClickListener = null;
 
-    /*public static void setOnClickListener(OnClickListener onClickListener) {
-        this.onClickListener = onClickListener;
-    }*/
-
     public interface OnClickListener {
-        void onClick(int level1, int level2, int level3) ;
+        void onExpandableClick(int level1);
+        void onExpandableClick(int level1, int level2);
+        void onExpandableClick(int level1, int level2, int level3);
     }
 }
